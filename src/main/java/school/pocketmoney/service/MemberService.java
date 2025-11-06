@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import school.pocketmoney.domain.Member;
 import school.pocketmoney.repository.MemberRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -45,5 +46,10 @@ public class MemberService {
         } else {
             return null; // 비밀번호 불일치: 로그인 실패
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<Member> findAllMemberOrderByPropertyDesc() {
+        return memberRepository.findAllByOrderByPropertyDesc();
     }
 }

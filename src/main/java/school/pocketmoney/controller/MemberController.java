@@ -8,6 +8,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import school.pocketmoney.domain.Member;
 import school.pocketmoney.service.MemberService;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -66,5 +67,15 @@ public class MemberController {
             model.addAttribute("errorMessage", "로그인 실패: 아이디 또는 비밀번호를 확인하세요.");
             return "members/login"; // 템플릿 파일 경로 수정
         }
+    }
+
+    // 랭킹 페이지
+    @GetMapping("/ranking")
+    public String showRanking(Model model) {
+        List<Member> rankingList = memberService.findAllMemberOrderByPropertyDesc();
+
+        model.addAttribute("rankingList", rankingList);
+
+        return "members/ranking";
     }
 }

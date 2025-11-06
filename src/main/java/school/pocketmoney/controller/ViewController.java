@@ -14,7 +14,7 @@ public class ViewController {
     }
 
     // 회원가입 페이지 이동
-    @GetMapping("/join")
+    @GetMapping("/api/member/join")
     public String joinPage() {
         // "members/join"을 반환하여 templates/members/join.html 파일을 찾습니다.
         return "members/join";

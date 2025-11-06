@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>사용자 랭킹</title>
+  <style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+      padding: 8px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+<h2> 유저 랭킹</h2>
+
+<table>
+  <thead>
+  <tr>
+    <th>순위</th>
+    <th>닉네임 (name)</th>
+    <th>자산 수치</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="member, iterStat : ${rankingList}">
+    <td th:text="${iterStat.count}">1</td>
+    <td th:text="${member.name}">사용자 이름</td>
+    <td th:text="${member.property}">0</td>
+  </tr>
+  <tr th:if="${#lists.isEmpty(rankingList)}">
+    <td colspan="3" style="text-align: center;">등록된 사용자가 없거나 랭킹 데이터가 비어있습니다.</td>
+  </tr>
+  </tbody>
+</table>
+
+<p><a href="/main">메인 페이지로 돌아가기</a></p>
+</body>
+</html>
