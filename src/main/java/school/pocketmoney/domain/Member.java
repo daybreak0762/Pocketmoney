@@ -55,4 +55,10 @@ public class Member {
         this.property = 10000000L;
         this.ad = false;
     }
+
+    // 관리자 확인 메서드
+    public boolean isAdmin() {
+        // ad 필드가 true이면 관리자로 간주
+        return this.ad != null && this.ad;
+    }
 }

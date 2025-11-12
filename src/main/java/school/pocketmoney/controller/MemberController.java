@@ -1,5 +1,6 @@
 package school.pocketmoney.controller;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -50,22 +51,19 @@ public class MemberController {
             return "redirect:/join";
         }
     }
-
-
-
+    
     // 로그인
     @PostMapping("/login")
-    public String login(@RequestParam String memberId, @RequestParam String pw, Model model) {
+    public String login(@RequestParam String memberId, @RequestParam String pw, Model model, HttpSession session) {
 
-        Member member = memberService.login(memberId, pw); // MemberService 호출
+        Member member = memberService.login(memberId, pw);
 
         if (member != null) {
-            // 로그인 성공 시 메인 페이지("/main")로 리다이렉트
+            session.setAttribute("loggedInUserId", member.getMemberId());
             return "redirect:/main";
         } else {
-            // 로그인 실패 시 templates/members/login.html 파일을 렌더링
             model.addAttribute("errorMessage", "로그인 실패: 아이디 또는 비밀번호를 확인하세요.");
-            return "members/login"; // 템플릿 파일 경로 수정
+            return "members/login";
         }
     }
 

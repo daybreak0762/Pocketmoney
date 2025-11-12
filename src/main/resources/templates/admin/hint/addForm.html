@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자: 힌트 추가</title>
+</head>
+<body>
+<h2>관리자 전용: 힌트 추가</h2>
+
+<div th:if="${successMessage}" style="color: green;"><p th:text="${successMessage}"></p></div>
+<div th:if="${errorMessage}" style="color: red;"><p th:text="${errorMessage}"></p></div>
+
+<p>현재 로그인된 관리자: <strong th:text="${loggedInUserId}">adminId_placeholder</strong></p>
+
+<form th:action="@{/admin/hint/add}" method="post" th:object="${hintRequestDto}">
+
+    <input type="hidden" id="adminId" name="adminId" th:value="${loggedInUserId}" required>
+
+    <div>
+        <label for="coNum">기업번호 (coNum):</label>
+        <input type="number" id="coNum" th:field="*{coNum}" required>
+    </div>
+
+    <div>
+        <label for="level">힌트 등급 (Level):</label>
+        <input type="text" id="level" th:field="*{level}">
+    </div>
+
+    <div>
+        <label for="htDate">힌트 적용일 (YYYY-MM-DD):</label>
+        <input type="date" id="htDate" th:field="*{htDate}" required>
+    </div>
+
+    <div>
+        <label for="text">힌트 내용 (Text):</label>
+        <textarea id="text" th:field="*{text}" required></textarea>
+    </div>
+
+    <div>
+        <label for="point">소모 포인트 (Point):</label>
+        <input type="number" id="point" th:field="*{point}">
+    </div>
+
+    <button type="submit">힌트 추가</button>
+</form>
+</body>
+</html>

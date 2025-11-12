@@ -49,6 +49,14 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
+    public Member getMemberById(String memberId) {
+        // memberRepository.findByMemberId는 Optional<Member>를 반환합니다.
+        return memberRepository.findByMemberId(memberId)
+                // Optional이 비어있다면(회원이 없다면) 예외를 발생시킵니다.
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 사용자를 찾을 수 없습니다."));
+    }
+
+    @Transactional(readOnly = true)
     public List<Member> findAllMemberOrderByPropertyDesc() {
         return memberRepository.findAllByOrderByPropertyDesc();
     }
