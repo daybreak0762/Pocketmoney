@@ -9,7 +9,6 @@ public class ViewController {
     // 로그인 페이지 이동
     @GetMapping("/")
     public String loginPage() {
-        // "members/login"을 반환하여 templates/members/login.html 파일을 찾습니다.
         return "members/login";
     }
 

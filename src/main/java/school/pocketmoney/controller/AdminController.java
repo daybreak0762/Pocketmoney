@@ -1,13 +1,13 @@
 package school.pocketmoney.controller;
 
 import jakarta.servlet.http.HttpSession;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import school.pocketmoney.domain.Hint;
 import school.pocketmoney.dto.HintRequestDto;
@@ -24,7 +24,6 @@ public class AdminController {
 
     // --- 🔑 관리자 기능: 힌트 추가 ---
     @GetMapping("/hint/add")
-    // 📌 HttpSession을 받아 처리
     public String addHintForm(Model model, HttpSession session) {
         String loggedInUserId = (String) session.getAttribute("loggedInUserId");
 
@@ -33,18 +32,13 @@ public class AdminController {
             return "redirect:/";
         }
 
-        // 📌 Model에 로그인 ID를 담아 View로 전달
         model.addAttribute("loggedInUserId", loggedInUserId);
         model.addAttribute("hintRequestDto", new HintRequestDto());
 
         return "admin/hint/addForm";
     }
 
-    /**
-     * 📝 힌트 추가 POST 요청: /admin/hint/add
-     */
     @PostMapping("/hint/add")
-    // 📌 @RequestParam adminId를 제거하고 HttpSession을 사용
     public String addHint(HttpSession session, @ModelAttribute HintRequestDto dto, RedirectAttributes redirectAttributes) {
         String adminId = (String) session.getAttribute("loggedInUserId"); // 세션에서 ID 가져오기
 
@@ -54,7 +48,6 @@ public class AdminController {
         }
 
         try {
-            // 📌 세션에서 가져온 adminId를 Service에 전달
             Hint savedHint = hintService.addHint(adminId, dto);
 
             redirectAttributes.addFlashAttribute("successMessage",
@@ -62,17 +55,16 @@ public class AdminController {
             return "redirect:/admin/hint/add";
 
         } catch (IllegalStateException | IllegalArgumentException e) {
-            // ... (오류 처리 로직 생략) ...
+            // 권한 없음 또는 날짜/ID 형식 오류 처리
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+
+            // 폼 페이지로 리다이렉트
             return "redirect:/admin/hint/add";
         }
     }
 
     @GetMapping("/dashboard")
     public String adminDashboard() {
-        // 📌 대시보드 템플릿 경로도 "admin/dashboard"로 수정합니다.
         return "admin/dashboard";
     }
 }
-
-
-
