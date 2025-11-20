@@ -4,10 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
 
@@ -61,4 +58,11 @@ public class Member {
         // ad 필드가 true이면 관리자로 간주
         return this.ad != null && this.ad;
     }
+
+    // 사용자 밴 처리 확인
+    public void updateBanStatus(boolean isBanned) {
+        // 인자로 받아온 값으로 밴 유무 확인
+        this.ban = isBanned;
+    }
+    
 }

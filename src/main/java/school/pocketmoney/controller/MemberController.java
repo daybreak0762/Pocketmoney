@@ -59,9 +59,27 @@ public class MemberController {
         Member member = memberService.login(memberId, pw);
 
         if (member != null) {
+            // 📌 1. 차단 상태 확인
+            if (member.getBan() != null && member.getBan() == true) {
+                // 차단(ban=true)된 유저인 경우
+                session.invalidate(); // 혹시 모를 기존 세션 무효화
+                model.addAttribute("errorMessage", "⚠️ 이 계정은 관리자에 의해 접속이 차단되었습니다.");
+                return "members/login"; // 로그인 페이지로 돌려보냄
+            }
+
+            if (member.getAd() != null && member.getAd() == true) { // null 체크 추가 권장
+                session.setAttribute("loggedInUserId", member.getMemberId());
+                return "redirect:/admin/dashboard"; //
+            }
+
+            // 2. 정상 유저: 세션에 ID 저장
             session.setAttribute("loggedInUserId", member.getMemberId());
+
+            // 3. 메인 페이지로 이동
             return "redirect:/main";
+
         } else {
+            // 로그인 실패 로직
             model.addAttribute("errorMessage", "로그인 실패: 아이디 또는 비밀번호를 확인하세요.");
             return "members/login";
         }

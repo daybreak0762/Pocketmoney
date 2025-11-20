@@ -60,4 +60,22 @@ public class MemberService {
     public List<Member> findAllMemberOrderByPropertyDesc() {
         return memberRepository.findAllByOrderByPropertyDesc();
     }
+
+    // 전체 회원 목록 조회
+    public List<Member> findAllMembers() {
+        // [TODO] MemberRepository를 사용하여 DB에서 모든 Member 엔티티를 List 형태로 조회하여 반환하는 로직 구현
+        return memberRepository.findAll();
+    }
+
+    // 2. 회원 차단/차단 해제 상태 업데이트
+    @Transactional
+    public void updateBanStatus(String memberId, boolean isBanned) {
+        // 1. userId로 회원 엔티티를 조회
+        Member member = memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID(" + memberId + ")의 회원을 찾을 수 없습니다."));
+
+        // 2. 'ban' 필드를 받아온 isBanned 값으로 업데이트
+        member.updateBanStatus(isBanned);
+
+    }
 }

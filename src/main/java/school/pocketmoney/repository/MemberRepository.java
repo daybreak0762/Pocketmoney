@@ -12,4 +12,6 @@ public interface MemberRepository extends JpaRepository<Member, String> {
     
     // property를 기준으로 내림차순 정렬 조회
     List<Member> findAllByOrderByPropertyDesc();
+
+    //
 }

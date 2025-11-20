@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 - 회원 목록 및 차단 관리</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        table { width: 80%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .ban-status { font-weight: bold; }
+        .banned { color: red; }
+        .active { color: green; }
+        button { cursor: pointer; padding: 5px 10px; border: none; border-radius: 3px; }
+        .btn-ban { background-color: #f44336; color: white; }
+        .btn-unban { background-color: #4CAF50; color: white; }
+    </style>
+</head>
+<body>
+
+<h1>👤 전체 회원 목록 및 차단 관리</h1>
+
+<div th:if="${successMessage}" class="active" th:text="${successMessage}" style="margin-bottom: 10px;"></div>
+<div th:if="${errorMessage}" class="banned" th:text="${errorMessage}" style="margin-bottom: 10px;"></div>
+
+<table id="memberTable">
+    <thead>
+    <tr>
+        <th>아이디 (userId)</th>
+        <th>이름 (name)</th>
+        <th>이메일 (email)</th>
+        <th>자산 (property)</th>
+        <th>차단 상태</th>
+        <th>관리</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="member : ${members}">
+        <td th:text="${member.memberId}">testId123</td>
+        <td th:text="${member.name}">홍길동</td>
+        <td th:text="${member.email}">test@example.com</td>
+        <td th:text="${#numbers.formatDecimal(member.property, 0, 'COMMA', 0, 'POINT')}">5,000,000</td>
+
+        <td>
+                <span th:classappend="${member.ban} ? 'banned' : 'active'"
+                      th:text="${member.ban} ? '🚫 차단됨' : '✅ 정상'">차단 상태</span>
+        </td>
+
+        <td>
+            <form th:action="@{|/admin/members/ban/${member.memberId}|}" method="post" style="display: inline;">
+
+                <div th:if="${member.ban}">
+                    <input type="hidden" name="status" value="false" />
+                    <button type="submit" class="btn-unban">차단 해제</button>
+                </div>
+
+                <div th:unless="${member.ban}">
+                    <input type="hidden" name="status" value="true" />
+                    <button type="submit" class="btn-ban">접속 차단</button>
+                </div>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<p style="margin-top: 20px;"><a th:href="@{/admin/dashboard}">관리자 대시보드로 돌아가기</a></p>
+</body>
+</html>
