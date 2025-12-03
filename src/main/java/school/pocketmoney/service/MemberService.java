@@ -56,15 +56,17 @@ public class MemberService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 사용자를 찾을 수 없습니다."));
     }
 
-    @Transactional(readOnly = true)
-    public List<Member> findAllMemberOrderByPropertyDesc() {
-        return memberRepository.findAllByOrderByPropertyDesc();
-    }
-
     // 전체 회원 목록 조회
     public List<Member> findAllMembers() {
         // [TODO] MemberRepository를 사용하여 DB에서 모든 Member 엔티티를 List 형태로 조회하여 반환하는 로직 구현
         return memberRepository.findAll();
+    }
+
+    //📌 랭킹 목록 조회 (관리자 제외), 자산(property) 기준으로 내림차순 정렬된 일반 회원 목록을 반환합니다.
+    @Transactional(readOnly = true)
+    public List<Member> getRankingList() {
+        // Repository에서 관리자 제외 및 정렬된 리스트를 가져옴
+        return memberRepository.findByAdFalseOrAdIsNullOrderByPropertyDesc();
     }
 
     // 2. 회원 차단/차단 해제 상태 업데이트
@@ -78,4 +80,5 @@ public class MemberService {
         member.updateBanStatus(isBanned);
 
     }
+
 }

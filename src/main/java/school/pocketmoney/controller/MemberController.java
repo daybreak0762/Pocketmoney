@@ -76,7 +76,11 @@ public class MemberController {
             session.setAttribute("loggedInUserId", member.getMemberId());
 
             // 3. 메인 페이지로 이동
-            return "redirect:/main";
+            if (member.getAd() == true) {
+                return "redirect:/admin/dashboard";
+            } else {
+                return "redirect:/main";
+            }
 
         } else {
             // 로그인 실패 로직
@@ -88,7 +92,7 @@ public class MemberController {
     // 랭킹 페이지
     @GetMapping("/ranking")
     public String showRanking(Model model) {
-        List<Member> rankingList = memberService.findAllMemberOrderByPropertyDesc();
+        List<Member> rankingList = memberService.getRankingList();
 
         model.addAttribute("rankingList", rankingList);
 

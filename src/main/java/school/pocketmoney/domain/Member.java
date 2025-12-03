@@ -47,7 +47,7 @@ public class Member {
         // 나머지 필드들은 기본값 설정
         this.ranking = 0L;
         this.waypoint = new Date(2015, 1, 1); // 예시: 현재 시간
-        this.pt = 0;
+        this.pt = 500;
         this.ban = false;
         this.property = 10000000L;
         this.ad = false;
