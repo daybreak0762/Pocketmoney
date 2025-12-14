@@ -1,40 +1,159 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>사용자 랭킹</title>
-  <style>
-    table, th, td {
-      border: 1px solid black;
-      border-collapse: collapse;
-      padding: 8px;
-      text-align: left;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏆 포켓머니 랭킹</title>
+    <style>
+        /* 기본 스타일 및 배경 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 컨테이너 스타일 */
+        .ranking-container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 헤더 및 제목 */
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+            letter-spacing: 1px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1em;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 15px;
+        }
+
+        /* 랭킹 테이블 스타일 */
+        .ranking-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px; /* 행 간격 추가 */
+        }
+
+        /* 테이블 헤더 */
+        .ranking-table th {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+        /* 헤더 모서리 둥글게 */
+        .ranking-table th:first-child { border-top-left-radius: 8px; }
+        .ranking-table th:last-child { border-top-right-radius: 8px; }
+
+        /* 테이블 바디 (랭킹 행) */
+        .ranking-table td {
+            background-color: #ffffff;
+            padding: 15px 15px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            border: none;
+            transition: background-color 0.2s;
+        }
+        .ranking-table td:first-child { border-left: 5px solid transparent; }
+
+        .ranking-table tr:hover td {
+            background-color: #ecf0f1;
+        }
+
+        /* 랭킹 순위에 따른 색상 및 뱃지 효과 */
+        .rank-1 td:first-child { border-left-color: gold; font-size: 1.2em; font-weight: bold; color: gold; }
+        .rank-2 td:first-child { border-left-color: silver; font-size: 1.1em; font-weight: bold; color: silver; }
+        .rank-3 td:first-child { border-left-color: #cd7f32; font-weight: bold; color: #cd7f32; }
+
+        /* 자산 (Property) 강조 */
+        .asset-column {
+            font-weight: 600;
+            color: #27ae60; /* 녹색 계열 */
+        }
+
+        /* 순위 번호 뱃지 */
+        .rank-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            border-radius: 50%;
+            background-color: #e8e8e8;
+            font-weight: bold;
+            color: #555;
+        }
+        .rank-1 .rank-number { background-color: gold; color: white; }
+        .rank-2 .rank-number { background-color: silver; color: white; }
+        .rank-3 .rank-number { background-color: #cd7f32; color: white; }
+
+        /* 홈 버튼 */
+        .home-link {
+            display: block;
+            margin-top: 30px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+        .home-link:hover {
+            background-color: #2980b9;
+        }
+    </style>
 </head>
 <body>
-<h2> 유저 랭킹</h2>
+<div class="ranking-container">
+    <h1>🏆 실시간 자산 랭킹</h1>
+    <p class="subtitle">모든 플레이어 (관리자 제외)의 자산 순위입니다.</p>
 
-<table>
-  <thead>
-  <tr>
-    <th>순위</th>
-    <th>닉네임 (name)</th>
-    <th>자산 수치</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr th:each="member, iterStat : ${rankingList}">
-    <td th:text="${iterStat.count}">1</td>
-    <td th:text="${member.name}">사용자 이름</td>
-    <td th:text="${member.property}">0</td>
-  </tr>
-  <tr th:if="${#lists.isEmpty(rankingList)}">
-    <td colspan="3" style="text-align: center;">등록된 사용자가 없거나 랭킹 데이터가 비어있습니다.</td>
-  </tr>
-  </tbody>
-</table>
+    <table class="ranking-table">
+        <thead>
+        <tr>
+            <th>순위</th>
+            <th>아이디</th>
+            <th>이름</th>
+            <th>자산 총액</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="member, iterStat : ${rankingList}"
+            th:classappend="${iterStat.index == 0} ? 'rank-1' : (${iterStat.index == 1} ? 'rank-2' : (${iterStat.index == 2} ? 'rank-3' : ''))">
 
-<p><a href="/main">메인 페이지로 돌아가기</a></p>
+            <td>
+                <span class="rank-number" th:text="${iterStat.count}">1</span>
+            </td>
+
+            <td th:text="${member.memberId}">user_id_1</td>
+
+            <td th:text="${member.name}">홍길동</td>
+
+            <td class="asset-column"
+                th:text="${#numbers.formatDecimal(member.property, 0, 'COMMA', 0, 'POINT')} + ' G'">5,000,000 G</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <a th:href="@{/main}" class="home-link">게임으로 돌아가기</a>
+</div>
 </body>
 </html>

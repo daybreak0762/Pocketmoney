@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>관리자 - 기업 등록</title>
+</head>
+<body>
+<h1>🏢 새로운 기업 등록</h1>
+
+<div th:if="${successMessage}" style="color: green;" th:text="${successMessage}"></div>
+<div th:if="${errorMessage}" style="color: red;" th:text="${errorMessage}"></div>
+
+<form th:action="@{/admin/company/add}" method="post" th:object="${companyRequestDto}">
+
+    <div>
+        <label for="coName">기업명:</label>
+        <input type="text" id="coName" th:field="*{coName}" required />
+    </div>
+
+    <div>
+        <label for="field">분야:</label>
+        <input type="text" id="field" th:field="*{field}" required />
+    </div>
+
+    <button type="submit">기업 등록</button>
+</form>
+
+<p><a th:href="@{/admin/dashboard}">대시보드로 돌아가기</a></p>
+</body>
+</html>

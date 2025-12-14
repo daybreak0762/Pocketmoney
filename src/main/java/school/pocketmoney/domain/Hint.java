@@ -19,8 +19,10 @@ public class Hint {
     @Column(name = "htNum", nullable = false)
     private Long htNum; // 힌트번호
 
-    @Column(name = "coNum", nullable = false)
-    private Long coNum; // 기업번호
+    // Hint 테이블의 'coNum' 컬럼이 Company의 PK를 참조합니다.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coNum") // Hint 테이블의 FK 컬럼명
+    private Company company; // ⬅️ 이 필드 이름이 Company.java의 mappedBy 값("company")과 일치해야 합니다.
 
     @Column(name = "Level")
     private String level; // 힌트 등급
@@ -36,11 +38,12 @@ public class Hint {
     private Integer point; // 소모포인트
 
     @Builder
-    public Hint(Long coNum, String level, Date htDate, String text, Integer point) {
-        this.coNum = coNum;
+    public Hint(Company company, String level, Date htDate, String text, Integer point) { // ⬅️ Company 추가
+        this.company = company; // ⬅️ 필드 할당 추가
         this.level = level;
         this.htDate = htDate;
         this.text = text;
         this.point = point;
     }
+
 }

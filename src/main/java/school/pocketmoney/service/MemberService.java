@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.pocketmoney.domain.Member;
+import school.pocketmoney.dto.MemberAssetDto;
 import school.pocketmoney.repository.MemberRepository;
 
 import java.util.List;
@@ -79,6 +80,18 @@ public class MemberService {
         // 2. 'ban' 필드를 받아온 isBanned 값으로 업데이트
         member.updateBanStatus(isBanned);
 
+    }
+
+    @Transactional(readOnly = true)
+    public MemberAssetDto getMemberAssets(String memberId) {
+        Member member = memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자 ID를 찾을 수 없습니다."));
+
+        return new MemberAssetDto(
+                member.getMemberId(),
+                member.getProperty(),
+                member.getPt()
+        );
     }
 
 }

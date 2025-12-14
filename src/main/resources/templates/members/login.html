@@ -1,30 +1,141 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>로그인</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>포켓머니 로그인</title>
+    <style>
+        /* 폰트 및 기본 스타일 설정 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* 로그인 컨테이너 스타일 */
+        .login-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #34495e;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 600;
+        }
+
+        /* 입력 필드 스타일 */
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .input-group input[type="text"],
+        .input-group input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #bdc3c7;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+            outline: none;
+        }
+
+        /* 버튼 스타일 */
+        button[type="submit"] {
+            background-color: #3498db; /* 메인 색상 */
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #2980b9; /* 마우스 오버 시 색상 */
+            transform: translateY(-2px); /* 살짝 위로 이동 */
+        }
+
+        /* 에러 메시지 스타일 */
+        .error-message {
+            color: #e74c3c;
+            background-color: #fdecea;
+            border: 1px solid #e74c3c;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        /* 회원가입/링크 스타일 */
+        .sub-link {
+            display: block;
+            margin-top: 25px;
+            color: #3498db;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .sub-link:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-<h2>사용자 로그인</h2>
+<div class="login-container">
+    <h1>💰 포켓머니</h1>
 
-<div th:if="${errorMessage}" style="color: red;">
-  <p th:text="${errorMessage}"></p>
+    <div th:if="${errorMessage}" class="error-message" th:text="${errorMessage}">
+        로그인 실패 메시지
+    </div>
+
+    <form th:action="@{/api/member/login}" method="post">
+
+        <div class="input-group">
+            <label for="memberId">아이디</label>
+            <input type="text" id="memberId" name="memberId" required>
+        </div>
+
+        <div class="input-group">
+            <label for="pw">비밀번호</label>
+            <input type="password" id="pw" name="pw" required>
+        </div>
+
+        <button type="submit">로그인</button>
+    </form>
+
+    <a th:href="@{/register}" class="sub-link">
+        계정이 없으신가요? 회원가입
+    </a>
 </div>
-
-<form action="/api/member/login" method="post">
-  <div>
-    <label for="memberId">아이디:</label>
-    <input type="text" id="memberId" name="memberId" required>
-  </div>
-  <div>
-    <label for="pw">비밀번호:</label>
-    <input type="password" id="pw" name="pw" required>
-  </div>
-  <div>
-    <button type="submit">로그인</button>
-  </div>
-</form>
-
-<p>아직 회원이 아니신가요? <a href="/api/member/join">회원가입</a></p>
 </body>
 </html>

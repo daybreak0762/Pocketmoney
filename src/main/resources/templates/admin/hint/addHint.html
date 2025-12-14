@@ -16,8 +16,15 @@
     <input type="hidden" id="adminId" name="adminId" th:value="${loggedInUserId}" required>
 
     <div>
-        <label for="coNum">기업번호 (coNum):</label>
-        <input type="number" id="coNum" th:field="*{coNum}" required>
+        <label for="coNum">기업 선택:</label>
+        <select id="coNum" th:field="*{coNum}" required>
+            <option value="">-- 기업을 선택하세요 --</option>
+            <option th:each="company : ${companies}"
+                    th:value="${company.coNum}"
+                    th:text="${company.coName} + ' (' + ${company.coNum} + ')'">
+                삼성전자 (1)
+            </option>
+        </select>
     </div>
 
     <div>

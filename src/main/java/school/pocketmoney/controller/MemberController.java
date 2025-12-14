@@ -2,18 +2,19 @@ package school.pocketmoney.controller;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import school.pocketmoney.domain.Member;
+import school.pocketmoney.dto.MemberAssetDto;
 import school.pocketmoney.service.MemberService;
 
 import java.util.List;
 import java.util.Map;
 
 
-@Controller
+@RestController
 @RequestMapping("/api/member")
 @RequiredArgsConstructor
 public class MemberController {
@@ -97,5 +98,22 @@ public class MemberController {
         model.addAttribute("rankingList", rankingList);
 
         return "members/ranking";
+    }
+
+    // Money 버튼 클릭 시에 호출 => 회원이 보유한 자산과 포인트 반환
+    @GetMapping("/asserts")
+    public ResponseEntity<MemberAssetDto> getMyAsserts(HttpSession session) {
+        String memberId = (String) session.getAttribute("memberId");
+
+        if (memberId == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        try {
+            MemberAssetDto asserts = memberService.getMemberAssets(memberId);
+            return ResponseEntity.ok(asserts);
+        }  catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
