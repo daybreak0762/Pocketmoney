@@ -17,15 +17,15 @@ public class Company {
     // 📌 기본 키 (Primary Key)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "coNum")
+    @Column(name = "co_num")
     private Long coNum;
 
     // 📌 기업명
-    @Column(name = "coName", length = 255)
+    @Column(name = "co_name", length = 255)
     private String coName;
 
     // 📌 분야
-    @Column(name = "Field", length = 255)
+    @Column(name = "field", length = 255)
     private String field;
 
     // 📌 연관 관계: Stock (일대다)

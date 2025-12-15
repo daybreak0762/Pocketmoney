@@ -53,6 +53,23 @@
             padding: 0;
         }
     </style>
+    <script>
+        function getMemberAssetsToGodot() {
+            console.log("Assets API 호출 시작");
+            fetch('/api/member/assets', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            })
+                // ... (rest of the logic) ...
+                .catch(error => {
+                    console.error("자산 정보 조회 중 오류 발생:", error);
+                    // 오류 발생 시 Godot으로 메시지 전달 로직 추가 가능
+                });
+        }
+    </script>
 
     <button class="openbtn" onclick="toggleSidebar()">☰</button>
 

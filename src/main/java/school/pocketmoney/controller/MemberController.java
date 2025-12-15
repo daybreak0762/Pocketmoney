@@ -3,6 +3,7 @@ package school.pocketmoney.controller;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 
-@RestController
+@Controller
 @RequestMapping("/api/member")
 @RequiredArgsConstructor
 public class MemberController {
@@ -101,9 +102,10 @@ public class MemberController {
     }
 
     // Money 버튼 클릭 시에 호출 => 회원이 보유한 자산과 포인트 반환
-    @GetMapping("/asserts")
+    @GetMapping("/assets")
+    @ResponseBody
     public ResponseEntity<MemberAssetDto> getMyAsserts(HttpSession session) {
-        String memberId = (String) session.getAttribute("memberId");
+        String memberId = (String) session.getAttribute("loggedInUserId");
 
         if (memberId == null) {
             return ResponseEntity.status(401).build();
