@@ -1,0 +1,57 @@
+<h2>주가 등록</h2>
+
+<div th:if="${successMessage}" th:text="${successMessage}" style="color: blue;"></div>
+<div th:if="${errorMessage}" th:text="${errorMessage}" style="color: red;"></div>
+
+<form th:action="@{/admin/stock/add}" th:object="${stockRequestDto}" method="post">
+
+    <div>
+        <label for="coNum">기업 선택:</label>
+        <select id="coNum" th:field="*{coNum}" onchange="updateRecommendedDate()">
+            <option value="">-- 기업을 선택하세요 --</option>
+            <option th:each="company : ${companies}"
+                    th:value="${company.coNum}"
+                    th:text="${company.coName}"
+                    th:selected="${company.coNum == stockRequestDto.coNum}">
+            </option>
+        </select>
+    </div>
+
+    <div>
+        <label for="stockDate">주가 날짜:</label>
+        <input type="date" id="stockDate" th:field="*{stockDate}" required />
+    </div>
+
+    <div>
+        <label for="stock">주가:</label>
+        <input type="number" id="stock" th:field="*{stock}" required />
+    </div>
+
+    <button type="submit">주가 등록</button>
+</form>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // 서버에서 전달받은 다음 추천 날짜 맵 (실제 구현에서는 AJAX로 대체되어야 함)
+    // 현재는 coNum 선택 시 서버에 다시 요청하지 않으므로, coNum 선택 시 서버로 재요청하는 코드가 필요합니다.
+
+    // 초기 로딩 시 recommendedStockDate가 있다면 설정
+    var initialRecommendedDate = [[${recommendedStockDate}]];
+    if (initialRecommendedDate && initialRecommendedDate !== '2015-01-01') {
+        document.getElementById('stockDate').value = initialRecommendedDate;
+    }
+
+    // 기업 선택 변경 시, 서버에 다음 등록 날짜를 요청하는 함수
+    function updateRecommendedDate() {
+        var coNum = document.getElementById('coNum').value;
+        if (coNum) {
+            // 📌 TODO: 서버 API에 AJAX 요청을 보내서 해당 coNum의 다음 등록 날짜를 받아와야 합니다.
+            // 현재는 페이지를 리다이렉트 하는 방식으로 대체합니다.
+            window.location.href = '/admin/stock/add?coNum=' + coNum;
+
+        } else {
+            document.getElementById('stockDate').value = '2015-01-01'; // 기본값으로 초기화
+        }
+    }
+    /*]]>*/
+</script>

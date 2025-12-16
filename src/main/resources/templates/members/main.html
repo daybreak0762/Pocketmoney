@@ -56,17 +56,54 @@
     <script>
         function getMemberAssetsToGodot() {
             console.log("Assets API 호출 시작");
+
+            // 1. API 호출 (fetch)
             fetch('/api/member/assets', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                // 📌 중요: 세션 쿠키를 서버로 보내기 위해 필수입니다. (401 Unauthorized 방지)
                 credentials: 'include'
             })
-                // ... (rest of the logic) ...
+                .then(response => {
+                    // 2. 응답 상태 코드 확인 및 오류 처리
+                    if (response.status === 401) {
+                        console.error("인증 실패 (401). 세션 만료 또는 로그인 필요.");
+                        // 선택적: 로그인 페이지로 리다이렉트 처리
+                        // window.location.href = '/';
+                        throw new Error('Unauthorized');
+                    }
+                    if (!response.ok) {
+                        // 404, 500 등 기타 오류 처리
+                        throw new Error('API 호출 실패. Status: ' + response.status);
+                    }
+
+                    // 3. 응답 본문을 JSON으로 파싱
+                    return response.json();
+                })
+                .then(data => {
+                    // 4. 데이터 수신 성공 및 Godot으로 전달
+                    if (data) {
+                        console.log("Godot으로 전송할 최종 데이터:", data);
+
+                        // Godot 엔진의 전역 함수(window.receive_assets)를 호출합니다.
+                        if (window.receive_assets) {
+                            // JSON 객체를 문자열로 변환하여 Godot 함수에 인자로 전달
+                            const jsonString = JSON.stringify(data);
+                            window.receive_assets(jsonString);
+                            console.log("Godot 전역 함수 호출 완료.");
+                        } else {
+                            console.error("Godot 엔진의 receive_assets 함수를 찾을 수 없습니다. Godot 스크립트를 확인하세요.");
+                        }
+
+                    }
+                })
                 .catch(error => {
-                    console.error("자산 정보 조회 중 오류 발생:", error);
-                    // 오류 발생 시 Godot으로 메시지 전달 로직 추가 가능
+                    // 5. 네트워크 오류 (Failed to fetch) 및 기타 예외 처리
+                    console.error("자산 정보 조회 중 최종 오류 발생:", error.message);
+                    // 사용자에게 오류를 알리는 Godot 내부 함수 호출 가능
+                    // if (window.show_error) { window.show_error("자산 로드 실패"); }
                 });
         }
     </script>

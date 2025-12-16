@@ -16,6 +16,15 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
+
+    /**
+     * ID로 Member 엔티티를 조회하는 메서드
+     */
+    public Optional<Member> findByMemberId(String memberId) {
+        return memberRepository.findByMemberId(memberId);
+    }
+
+
     // 회원가입
     @Transactional
     public Member join(Member member) {
