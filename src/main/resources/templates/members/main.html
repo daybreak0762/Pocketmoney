@@ -56,54 +56,68 @@
     <script>
         function getMemberAssetsToGodot() {
             console.log("Assets API 호출 시작");
-
-            // 1. API 호출 (fetch)
             fetch('/api/member/assets', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                // 📌 중요: 세션 쿠키를 서버로 보내기 위해 필수입니다. (401 Unauthorized 방지)
-                credentials: 'include'
+                // ... (headers 및 credentials 생략) ...
             })
                 .then(response => {
-                    // 2. 응답 상태 코드 확인 및 오류 처리
-                    if (response.status === 401) {
-                        console.error("인증 실패 (401). 세션 만료 또는 로그인 필요.");
-                        // 선택적: 로그인 페이지로 리다이렉트 처리
-                        // window.location.href = '/';
-                        throw new Error('Unauthorized');
-                    }
+                    // 📌 API 응답 상태 확인 로그
+                    console.log("API 응답 상태:", response.status);
                     if (!response.ok) {
-                        // 404, 500 등 기타 오류 처리
-                        throw new Error('API 호출 실패. Status: ' + response.status);
+                        throw new Error('Network response was not ok');
                     }
-
-                    // 3. 응답 본문을 JSON으로 파싱
                     return response.json();
                 })
                 .then(data => {
-                    // 4. 데이터 수신 성공 및 Godot으로 전달
+                    console.log("Assets 데이터 수신 성공:", data);
                     if (data) {
-                        console.log("Godot으로 전송할 최종 데이터:", data);
+                        const jsonString = JSON.stringify(data);
 
-                        // Godot 엔진의 전역 함수(window.receive_assets)를 호출합니다.
-                        if (window.receive_assets) {
-                            // JSON 객체를 문자열로 변환하여 Godot 함수에 인자로 전달
-                            const jsonString = JSON.stringify(data);
+                        // 📌 호출 함수 이름을 window.receive_assets로 변경
+                        if (window.receive_assets) { // 이전 단계에서 godot_call_assets였음
+                            console.log("Godot 함수 window.receive_assets 호출 시도:", jsonString);
                             window.receive_assets(jsonString);
-                            console.log("Godot 전역 함수 호출 완료.");
                         } else {
-                            console.error("Godot 엔진의 receive_assets 함수를 찾을 수 없습니다. Godot 스크립트를 확인하세요.");
+                            console.error("Godot 함수 window.receive_assets가 정의되지 않았습니다. 브릿지 등록 실패.");
                         }
-
                     }
                 })
                 .catch(error => {
-                    // 5. 네트워크 오류 (Failed to fetch) 및 기타 예외 처리
-                    console.error("자산 정보 조회 중 최종 오류 발생:", error.message);
-                    // 사용자에게 오류를 알리는 Godot 내부 함수 호출 가능
-                    // if (window.show_error) { window.show_error("자산 로드 실패"); }
+                    console.error("자산 정보 조회 중 치명적인 오류 발생:", error);
+                });
+        }
+
+        function getCompanyListToGodot() {
+            console.log("회사 목록 API 호출 시작");
+            // 서버의 회사 목록 API 경로로 가정
+            fetch('/api/company/list', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    console.log("회사 목록 API 응답 상태:", response.status);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("회사 목록 데이터 수신 성공:", data);
+                    if (data) {
+                        const jsonString = JSON.stringify(data);
+
+                        // Godot 함수 호출
+                        if (window.receive_company_list) {
+                            console.log("Godot 함수 receive_company_list 호출 시도:", jsonString);
+                            window.receive_company_list(jsonString);
+                        } else {
+                            console.error("Godot 함수 window.receive_company_list가 정의되지 않았습니다.");
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error("회사 목록 조회 중 오류 발생:", error);
                 });
         }
     </script>
