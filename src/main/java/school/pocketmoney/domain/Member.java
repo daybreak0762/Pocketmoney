@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -65,5 +66,4 @@ public class Member {
         // 인자로 받아온 값으로 밴 유무 확인
         this.ban = isBanned;
     }
-
 }

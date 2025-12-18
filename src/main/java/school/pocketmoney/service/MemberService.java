@@ -103,4 +103,26 @@ public class MemberService {
         );
     }
 
+    // 📌 포인트 변환 로직 (1000만원 -> 500포인트)
+    @Transactional // DB 거래 안전장치
+    public Member exchangeMoneyToPoint(String memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+
+        long COST = 10000000L; // 1000만 원
+        int GAIN_POINT = 500;  // 500 포인트
+
+        // 1. 돈이 충분한지 확인
+        if (member.getProperty() < COST) {
+            throw new IllegalStateException("자산이 부족합니다! (필요: " + COST + "원)");
+        }
+
+        // 2. 자산 차감 및 포인트 지급
+        member.setProperty(member.getProperty() - COST);
+        member.setPt(member.getPt() + GAIN_POINT);
+
+        // 3. 저장 후 반환
+        return memberRepository.save(member);
+    }
+
 }

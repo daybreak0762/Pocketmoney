@@ -118,4 +118,29 @@ public class MemberController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    // 📌 포인트 변환 API
+    @PostMapping("/exchange")
+    // 📌 [수정] @RequestBody를 이용해 JSON 데이터를 Map으로 받습니다.
+    public ResponseEntity<?> exchangePoint(@RequestBody Map<String, String> requestData) {
+        try {
+            // 1. 프론트엔드(JS)에서 보낸 "memberId" 꺼내기
+            String memberId = requestData.get("memberId");
+
+            System.out.println("서버: 포인트 변환 요청 받음 (ID: " + memberId + ")");
+
+            if (memberId == null || memberId.isEmpty()) {
+                throw new IllegalArgumentException("아이디가 전달되지 않았습니다.");
+            }
+
+            // 2. 서비스 호출 (동적 아이디 사용)
+            Member updatedMember = memberService.exchangeMoneyToPoint(memberId);
+
+            return ResponseEntity.ok(updatedMember);
+
+        } catch (Exception e) {
+            System.out.println("포인트 변환 실패: " + e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

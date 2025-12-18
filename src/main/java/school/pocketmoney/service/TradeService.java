@@ -1,54 +1,82 @@
 package school.pocketmoney.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import school.pocketmoney.domain.Member;
-import school.pocketmoney.dto.TradeRequest;
+import school.pocketmoney.domain.Portfolio;
+import school.pocketmoney.domain.Stock;
 import school.pocketmoney.repository.MemberRepository;
+import school.pocketmoney.repository.PortfolioRepository;
+import school.pocketmoney.repository.StockRepository;
 
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class TradeService {
 
-    @Autowired
-    private MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
+    private final StockRepository stockRepository;       // 주가 확인용
+    private final PortfolioRepository portfolioRepository; // 보유량 기록용
 
-    // 📌 컨트롤러에서 호출하는 그 함수입니다!
-    @Transactional
-    public void processTrade(TradeRequest request) {
-
-        // 1. 현재 로그인한 사용자 찾기 (여기서는 테스트용으로 ID 'jwd11' 고정)
-        // 실제로는 request에서 ID를 받거나 세션에서 가져와야 합니다.
-        String memberId = "jwd11";
+    // 📌 [매수] count = "몇 주"를 살 것인가
+    public void buyStock(String memberId, Long companyId, int count) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("회원 없음"));
 
-        // 2. 거래 타입(매수/매도)에 따른 로직 수행
-        if ("BUY".equalsIgnoreCase(request.getTradeType())) {
-            // [매수] 로직
-            int cost = request.getAmount();
+        // 1. 주가 테이블(Stock)에서 해당 회사의 '현재 가격' 조회
+        Stock stockInfo = stockRepository.findByCompanyId(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("이 회사의 주가 정보가 없습니다."));
 
-            // 잔액 확인
-            if (member.getProperty() < cost) {
-                throw new IllegalStateException("잔액이 부족합니다.");
-            }
+        int currentPrice = stockInfo.getCurrentPrice();
 
-            // 돈 차감 (property는 회원의 자산을 의미하는 필드라고 가정)
-            member.setProperty(member.getProperty() - cost);
+        // 2. 총 필요한 돈 계산 (가격 x 수량)
+        long totalCost = (long) currentPrice * count;
 
-            // TODO: 나중에 여기에 '주식 보유량(Portfolio)'을 늘리는 코드를 추가해야 합니다.
-
-        } else if ("SELL".equalsIgnoreCase(request.getTradeType())) {
-            // [매도] 로직
-            int earnings = request.getAmount();
-
-            // 돈 증가
-            member.setProperty(member.getProperty() + earnings);
-
-            // TODO: 나중에 여기에 '주식 보유량'을 줄이는 코드를 추가해야 합니다.
+        // 3. 잔액 확인
+        if (member.getProperty() < totalCost) {
+            throw new IllegalStateException("돈이 부족합니다! (필요: " + totalCost + "원)");
         }
 
-        // 3. 변경된 자산 정보를 DB에 저장 (업데이트)
-        memberRepository.save(member);
+        // 4. 돈 차감
+        member.setProperty(member.getProperty() - totalCost);
+
+        // 5. 내 포트폴리오(Portfolio)에 주식 수량 추가
+        Portfolio myPortfolio = portfolioRepository.findByMemberIdAndCompanyId(memberId, companyId)
+                .orElse(new Portfolio(member, stockInfo.getCompany(), 0)); // 없으면 0주로 생성
+
+        myPortfolio.setQuantity(myPortfolio.getQuantity() + count);
+        portfolioRepository.save(myPortfolio);
+    }
+
+    // 📌 [매도] count = "몇 주"를 팔 것인가
+    public void sellStock(String memberId, Long companyId, int count) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원 없음"));
+
+        // 1. 내 포트폴리오 확인
+        Portfolio myPortfolio = portfolioRepository.findByMemberIdAndCompanyId(memberId, companyId)
+                .orElseThrow(() -> new IllegalArgumentException("보유한 주식이 없습니다."));
+
+        // 2. 수량 확인
+        if (myPortfolio.getQuantity() < count) {
+            throw new IllegalStateException("주식이 부족합니다! (보유: " + myPortfolio.getQuantity() + "주)");
+        }
+
+        // 3. 주가 테이블(Stock)에서 '현재 가격' 조회
+        Stock stockInfo = stockRepository.findByCompanyId(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("주가 정보 오류"));
+
+        int currentPrice = stockInfo.getCurrentPrice();
+        long totalGain = (long) currentPrice * count;
+
+        // 4. 주식 차감 및 돈 증가
+        myPortfolio.setQuantity(myPortfolio.getQuantity() - count);
+        member.setProperty(member.getProperty() + totalGain);
+
+        // (선택) 수량이 0이면 포트폴리오에서 삭제할 수도 있음
+        if (myPortfolio.getQuantity() == 0) {
+            portfolioRepository.delete(myPortfolio);
+        }
     }
 }
