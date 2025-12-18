@@ -120,6 +120,60 @@
                     console.error("회사 목록 조회 중 오류 발생:", error);
                 });
         }
+
+        // 📌 매수/매도 요청 함수
+        function sendTradeRequest(tradeType, companyId, amount) {
+            console.log(`[JS] 거래 요청 전송: ${tradeType}, 회사ID: ${companyId}, 금액: ${amount}`);
+
+            // 서버 API 주소 (본인의 설정에 맞게 수정)
+            fetch('http://localhost:8080/api/trade', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                // 서버가 받을 DTO 형태에 맞춰 JSON 생성
+                body: JSON.stringify({
+                    tradeType: tradeType, // "BUY" 또는 "SELL"
+                    companyId: companyId,
+                    amount: amount
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`서버 오류: ${response.status}`);
+                }
+                return response.text(); // 또는 response.json()
+            })
+            .then(data => {
+                console.log(`[JS] 거래 성공! 서버 응답:`, data);
+                alert("거래가 완료되었습니다!");
+
+                // ★ 중요: 거래가 끝났으니 자산(돈) 정보를 다시 받아와서 화면 갱신
+                getMemberAssetsToGodot();
+            })
+            .catch(error => {
+                console.error('[JS] 거래 실패:', error);
+                alert("거래 실패: 잔액이 부족하거나 서버 오류입니다.");
+            });
+        }
+
+        // 📌 그래프 데이터 요청 함수
+        function getCompanyPriceHistoryToGodot(companyId) {
+            console.log("[JS] 주가 기록 요청: ID " + companyId);
+
+            fetch(`http://localhost:8080/api/company/${companyId}/history`)
+            .then(response => response.json())
+            .then(data => {
+                console.log("[JS] 주가 데이터 수신:", data);
+                // Godot으로 데이터 전송 (window.receive_price_history 호출)
+                if (window.receive_price_history) {
+                    window.receive_price_history(JSON.stringify(data));
+                }
+            })
+            .catch(error => {
+                console.error("[JS] 주가 기록 가져오기 실패:", error);
+            });
+        }
     </script>
 
     <button class="openbtn" onclick="toggleSidebar()">☰</button>

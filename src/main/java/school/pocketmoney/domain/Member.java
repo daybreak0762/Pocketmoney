@@ -11,6 +11,7 @@ import java.util.Date;
 @Entity // 이 클래스가 JPA 엔티티임을 나타냅니다.
 @Table(name = "member") // 실제 테이블 이름 (확인 필요)
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // 기본 생성자
 public class Member {
 
@@ -64,5 +65,5 @@ public class Member {
         // 인자로 받아온 값으로 밴 유무 확인
         this.ban = isBanned;
     }
-    
+
 }
